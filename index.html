@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="ku" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>  سۆشیاڵ میدیاکانی خۆم </title>
+<link rel="icon" href="hama.ico">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #D4AF37;
+    --gold-light: #F5D76E;
+    --deep: #0a0a0f;
+    --navy: #080c1a;
+    --glass: rgba(255,255,255,0.06);
+    --glass-border: rgba(255,255,255,0.12);
+    --glow-blue: #4a90d9;
+    --glow-purple: #7b5ea7;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Tajawal', sans-serif;
+    background: var(--deep);
+    min-height: 100vh;
+    overflow-x: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 16px;
+  }
+
+  /* ── 3D Sulaymaniyah Background ── */
+  .bg-canvas {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+  }
+
+  .bg-canvas canvas {
+    width: 100%;
+    height: 100%;
+  }
+
+  .bg-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    background: 
+      radial-gradient(ellipse 80% 50% at 50% 100%, rgba(74,144,217,0.18) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 20% 30%, rgba(123,94,167,0.12) 0%, transparent 50%),
+      linear-gradient(180deg, rgba(8,12,26,0.55) 0%, rgba(10,10,15,0.75) 60%, rgba(10,10,15,0.95) 100%);
+  }
+
+  /* ── Stars ── */
+  .stars {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .star {
+    position: absolute;
+    background: #fff;
+    border-radius: 50%;
+    animation: twinkle var(--d) ease-in-out infinite alternate;
+  }
+
+  @keyframes twinkle {
+    from { opacity: var(--min); transform: scale(0.8); }
+    to   { opacity: var(--max); transform: scale(1.2); }
+  }
+
+  /* ── Page Container ── */
+  .page {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    max-width: 420px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+
+  /* ── Profile ── */
+  .profile {
+    text-align: center;
+    margin-bottom: 32px;
+    animation: fadeDown 0.8s cubic-bezier(0.22,1,0.36,1) both;
+  }
+
+  @keyframes fadeDown {
+    from { opacity:0; transform: translateY(-24px); }
+    to   { opacity:1; transform: translateY(0); }
+  }
+
+  .avatar-ring {
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    padding: 3px;
+    background: linear-gradient(135deg, var(--gold), var(--glow-blue), var(--glow-purple), var(--gold));
+    background-size: 300% 300%;
+    animation: gradShift 4s ease infinite;
+    margin: 0 auto 16px;
+    box-shadow: 0 0 40px rgba(212,175,55,0.3), 0 0 80px rgba(74,144,217,0.15);
+  }
+
+  @keyframes gradShift {
+    0%,100% { background-position: 0% 50%; }
+    50%      { background-position: 100% 50%; }
+  }
+
+  .avatar-inner {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: url('data:image/jpeg;base64,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') center/cover no-repeat;
+    border: 2px solid var(--deep);
+  }
+
+  .profile-name {
+    font-size: 26px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.5px;
+    text-shadow: 0 0 30px rgba(212,175,55,0.4);
+  }
+
+  .profile-sub {
+    font-size: 13px;
+    color: rgba(255,255,255,0.45);
+    margin-top: 6px;
+    font-weight: 300;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .city-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 10px;
+    padding: 4px 14px;
+    background: rgba(212,175,55,0.1);
+    border: 1px solid rgba(212,175,55,0.25);
+    border-radius: 20px;
+    font-size: 12px;
+    color: var(--gold-light);
+    font-weight: 500;
+  }
+
+  /* ── Link Cards ── */
+  .links-section {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .link-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 20px;
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    text-decoration: none;
+    color: #fff;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1), border-color 0.25s, box-shadow 0.25s;
+    backdrop-filter: blur(12px);
+    animation: slideUp 0.6s cubic-bezier(0.22,1,0.36,1) both;
+  }
+
+  .link-card:nth-child(1) { animation-delay: 0.1s; }
+  .link-card:nth-child(2) { animation-delay: 0.18s; }
+  .link-card:nth-child(3) { animation-delay: 0.26s; }
+  .link-card:nth-child(4) { animation-delay: 0.34s; }
+  .link-card:nth-child(5) { animation-delay: 0.42s; }
+  .link-card:nth-child(6) { animation-delay: 0.50s; }
+  .link-card:nth-child(7) { animation-delay: 0.58s; }
+
+  @keyframes slideUp {
+    from { opacity:0; transform: translateY(30px); }
+    to   { opacity:1; transform: translateY(0); }
+  }
+
+  .link-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--hover-glow);
+    opacity: 0;
+    transition: opacity 0.3s;
+    border-radius: inherit;
+  }
+
+  .link-card:hover::before { opacity: 1; }
+
+  .link-card:hover {
+    transform: translateY(-3px) scale(1.015);
+    border-color: var(--accent-color);
+    box-shadow: 0 8px 32px var(--shadow-color);
+  }
+
+  .link-card:active {
+    transform: translateY(0) scale(0.98);
+  }
+
+  /* Individual brand colors */
+  .card-facebook {
+    --accent-color: #1877F2;
+    --hover-glow: linear-gradient(135deg, rgba(24,119,242,0.12), transparent);
+    --shadow-color: rgba(24,119,242,0.25);
+  }
+  .card-twitter {
+    --accent-color: #1DA1F2;
+    --hover-glow: linear-gradient(135deg, rgba(29,161,242,0.12), transparent);
+    --shadow-color: rgba(29,161,242,0.25);
+  }
+  .card-instagram {
+    --accent-color: #E1306C;
+    --hover-glow: linear-gradient(135deg, rgba(225,48,108,0.12), rgba(131,58,180,0.08), transparent);
+    --shadow-color: rgba(225,48,108,0.25);
+  }
+  .card-tiktok {
+    --accent-color: #69C9D0;
+    --hover-glow: linear-gradient(135deg, rgba(105,201,208,0.1), rgba(238,29,82,0.08), transparent);
+    --shadow-color: rgba(105,201,208,0.25);
+  }
+  .card-telegram {
+    --accent-color: #2AABEE;
+    --hover-glow: linear-gradient(135deg, rgba(42,171,238,0.12), transparent);
+    --shadow-color: rgba(42,171,238,0.25);
+  }
+  .card-snapchat {
+    --accent-color: #FFFC00;
+    --hover-glow: linear-gradient(135deg, rgba(255,252,0,0.1), transparent);
+    --shadow-color: rgba(255,252,0,0.2);
+  }
+  .icon-snapchat { background: linear-gradient(135deg, #FFFC00, #f0e800); }
+  .card-whatsapp {
+    --accent-color: #25D366;
+    --hover-glow: linear-gradient(135deg, rgba(37,211,102,0.12), transparent);
+    --shadow-color: rgba(37,211,102,0.25);
+  }
+
+  .icon-wrap {
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 22px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .icon-facebook  { background: linear-gradient(135deg, #1877F2, #0d5cbf); }
+  .icon-twitter   { background: linear-gradient(135deg, #1DA1F2, #0d7dbd); }
+  .icon-instagram { background: linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
+  .icon-tiktok    { background: linear-gradient(135deg, #010101, #2a2a2a); box-shadow: inset 0 0 0 1px rgba(105,201,208,0.3); }
+  .icon-telegram  { background: linear-gradient(135deg, #2AABEE, #1a85c0); }
+  .icon-whatsapp  { background: linear-gradient(135deg, #25D366, #128C7E); }
+
+  .card-text {
+    flex: 1;
+    position: relative;
+    z-index: 1;
+  }
+
+  .card-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #fff;
+    display: block;
+  }
+
+  .card-handle {
+    font-size: 12px;
+    color: rgba(255,255,255,0.4);
+    margin-top: 2px;
+    display: block;
+    direction: ltr;
+    text-align: right;
+  }
+
+  .arrow-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.07);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+    transition: background 0.2s, transform 0.2s;
+    font-size: 12px;
+    color: rgba(255,255,255,0.4);
+  }
+
+  .link-card:hover .arrow-icon {
+    background: rgba(255,255,255,0.14);
+    transform: translateX(-3px);
+    color: rgba(255,255,255,0.7);
+  }
+
+  /* ── Footer ── */
+  .footer {
+    margin-top: 32px;
+    text-align: center;
+    font-size: 11px;
+    color: rgba(255,255,255,0.2);
+    letter-spacing: 1px;
+    animation: fadeIn 1.2s ease both;
+    animation-delay: 0.8s;
+  }
+
+  @keyframes fadeIn {
+    from { opacity:0; }
+    to   { opacity:1; }
+  }
+
+  .divider {
+    width: 60px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(212,175,55,0.4), transparent);
+    margin: 20px auto 20px;
+  }
+
+  /* ── Floating particles ── */
+  .particles {
+    position: fixed;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  .particle {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: var(--gold);
+    border-radius: 50%;
+    opacity: 0;
+    animation: floatUp var(--dur) ease-in var(--delay) infinite;
+  }
+
+  @keyframes floatUp {
+    0%   { opacity: 0; transform: translateY(0) scale(0); }
+    20%  { opacity: 0.6; transform: translateY(-20px) scale(1); }
+    80%  { opacity: 0.2; }
+    100% { opacity: 0; transform: translateY(-120px) scale(0.3); }
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(212,175,55,0.3); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<div class="bg-canvas"><canvas id="cityCanvas"></canvas></div>
+<div class="bg-overlay"></div>
+<div class="stars" id="stars"></div>
+<div class="particles" id="particles"></div>
+
+<main class="page">
+  <div class="profile">
+    <div class="avatar-ring">
+      <div class="avatar-inner"></div>
+    </div>
+    <div class="profile-name"> "حەمە" 🌐💻 </div>
+    <div class="profile-sub">🌐💻 سۆشیاڵ میدیاکانی خۆم</div>
+    <div class="city-badge">
+      <span>📍</span>
+      <span>سلێمانی، کوردستان</span>
+    </div>
+  </div>
+
+  <div class="links-section">
+
+    <a href="https://www.facebook.com/ha.ma.441259" class="link-card card-facebook" target="_blank" rel="noopener">
+      <div class="icon-wrap icon-facebook">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+      </div>
+      <div class="card-text">
+        <span class="card-title">فەیسبووک</span>
+        <span class="card-handle">ha.ma.441259</span>
+      </div>
+      <div class="arrow-icon">←</div>
+    </a>
+
+    <a href="https://x.com/Hama_88l" class="link-card card-twitter" target="_blank" rel="noopener">
+      <div class="icon-wrap icon-twitter">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+      </div>
+      <div class="card-text">
+        <span class="card-title">ئێکس / تویتەر</span>
+        <span class="card-handle">@Hama_88l</span>
+      </div>
+      <div class="arrow-icon">←</div>
+    </a>
+
+    <a href="https://instagram.com/hamaa_360" class="link-card card-instagram" target="_blank" rel="noopener">
+      <div class="icon-wrap icon-instagram">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+      </div>
+      <div class="card-text">
+        <span class="card-title">ئینستاگرام</span>
+        <span class="card-handle">@hamaa_360</span>
+      </div>
+      <div class="arrow-icon">←</div>
+    </a>
+
+    <a href="https://www.tiktok.com/@hamay_shwana" class="link-card card-tiktok" target="_blank" rel="noopener">
+      <div class="icon-wrap icon-tiktok">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.76a4.85 4.85 0 01-1.01-.07z"/></svg>
+      </div>
+      <div class="card-text">
+        <span class="card-title">تیکتۆک</span>
+        <span class="card-handle">@hamay_shwana</span>
+      </div>
+      <div class="arrow-icon">←</div>
+    </a>
+
+    <a href="https://t.me/Hamaa_99" class="link-card card-telegram" target="_blank" rel="noopener">
+      <div class="icon-wrap icon-telegram">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+      </div>
+      <div class="card-text">
+        <span class="card-title">تێلیگرام</span>
+        <span class="card-handle">@Hamaa_99</span>
+      </div>
+      <div class="arrow-icon">←</div>
+    </a>
+
+    <a href="https://www.snapchat.com/add/hamaa_360" class="link-card card-snapchat" target="_blank" rel="noopener">
+      <div class="icon-wrap icon-snapchat">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="black"><path d="M12.206.793c.99 0 4.347.276 5.93 3.821.529 1.193.403 3.219.299 4.847l-.003.06c-.012.18-.022.345-.03.51.075.045.203.09.401.09.3-.016.659-.12 1.033-.301.165-.088.344-.104.464-.104.182 0 .359.029.509.09.45.149.734.479.734.838.015.449-.39.839-1.213 1.168-.089.029-.209.075-.344.119-.45.135-1.139.36-1.333.81-.09.224-.061.524.12.868l.015.015c.06.136 1.526 3.475 4.791 4.014.255.044.435.27.42.509 0 .075-.015.149-.045.225-.24.569-1.273.988-3.146 1.271-.059.091-.12.375-.164.57-.029.179-.074.36-.134.553-.076.271-.27.405-.555.405h-.03c-.135 0-.313-.031-.538-.074-.36-.075-.765-.135-1.273-.135-.3 0-.599.015-.913.074-.6.104-1.123.464-1.723.884-.853.599-1.826 1.288-3.294 1.288-.06 0-.119-.015-.164-.015h-.1c-1.468 0-2.441-.69-3.294-1.288-.6-.42-1.107-.779-1.707-.884-.314-.045-.629-.074-.928-.074-.54 0-.958.089-1.288.149-.195.031-.36.074-.495.074h-.03c-.285 0-.48-.134-.555-.405-.046-.172-.09-.36-.136-.542-.046-.195-.105-.465-.164-.577-1.872-.284-2.906-.703-3.146-1.271-.036-.077-.045-.152-.045-.227.016-.238.195-.464.45-.509 3.264-.539 4.73-3.878 4.791-4.02l.016-.029c.18-.345.21-.645.119-.869-.195-.45-.884-.674-1.332-.809-.121-.045-.24-.09-.345-.134-1.047-.42-1.559-.93-1.499-1.529.09-.464.51-.793.868-.793.12 0 .24.016.374.074.42.194.826.299 1.154.299.22 0 .359-.044.45-.09l-.031-.569c-.098-1.626-.225-3.651.307-4.837C7.392 1.077 10.739.807 11.726.807l.48-.014z"/></svg>
+      </div>
+      <div class="card-text">
+        <span class="card-title">سناپچات</span>
+        <span class="card-handle">@hamaa_360</span>
+      </div>
+      <div class="arrow-icon">←</div>
+    </a>
+    
+
+    <a href="https://wa.me/9647705249726" class="link-card card-whatsapp" target="_blank" rel="noopener">
+      <div class="icon-wrap icon-whatsapp">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      </div>
+      <div class="card-text">
+        <span class="card-title">واتسئەپ</span>
+        <span class="card-handle">+964 770 524 9726</span>
+      </div>
+      <div class="arrow-icon">←</div>
+    </a>
+
+  </div>
+
+  <div class="divider"></div>
+  <div class="footer">
+    <div> by hama </div>
+  </div>
+</main>
+
+<script>
+// ── Stars ──
+const starsEl = document.getElementById('stars');
+for (let i = 0; i < 120; i++) {
+  const s = document.createElement('div');
+  s.className = 'star';
+  const size = Math.random() * 2.5 + 0.5;
+  s.style.cssText = `
+    left:${Math.random()*100}%;
+    top:${Math.random()*70}%;
+    width:${size}px; height:${size}px;
+    --min:${(Math.random()*0.3+0.1).toFixed(2)};
+    --max:${(Math.random()*0.5+0.4).toFixed(2)};
+    --d:${(Math.random()*3+2).toFixed(1)}s;
+    animation-delay:${(Math.random()*5).toFixed(1)}s;
+  `;
+  starsEl.appendChild(s);
+}
+
+// ── Particles ──
+const partEl = document.getElementById('particles');
+for (let i = 0; i < 20; i++) {
+  const p = document.createElement('div');
+  p.className = 'particle';
+  p.style.cssText = `
+    left:${Math.random()*100}%;
+    bottom:${Math.random()*30}%;
+    --dur:${(Math.random()*4+3).toFixed(1)}s;
+    --delay:${(Math.random()*6).toFixed(1)}s;
+  `;
+  partEl.appendChild(p);
+}
+
+// ── 3D City Skyline (Sulaymaniyah) ──
+const canvas = document.getElementById('cityCanvas');
+const ctx = canvas.getContext('2d');
+
+function resize() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  drawCity();
+}
+
+function drawCity() {
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+
+  // Sky gradient
+  const sky = ctx.createLinearGradient(0, 0, 0, H);
+  sky.addColorStop(0, '#02040e');
+  sky.addColorStop(0.5, '#060c1e');
+  sky.addColorStop(1, '#0d1530');
+  ctx.fillStyle = sky;
+  ctx.fillRect(0, 0, W, H);
+
+  // City buildings
+  drawBuildings(ctx, W, H);
+
+  // Ground glow
+  const grd = ctx.createLinearGradient(0, H*0.72, 0, H);
+  grd.addColorStop(0, 'rgba(74,144,217,0.08)');
+  grd.addColorStop(1, 'rgba(10,10,20,0.0)');
+  ctx.fillStyle = grd;
+  ctx.fillRect(0, H*0.72, W, H*0.28);
+
+  // Horizon glow
+  const hGlow = ctx.createRadialGradient(W/2, H*0.73, 10, W/2, H*0.73, W*0.6);
+  hGlow.addColorStop(0, 'rgba(74,144,217,0.15)');
+  hGlow.addColorStop(0.4, 'rgba(123,94,167,0.06)');
+  hGlow.addColorStop(1, 'transparent');
+  ctx.fillStyle = hGlow;
+  ctx.fillRect(0, 0, W, H);
+}
+
+function drawMountains(ctx, W, H) {
+  const baseY = H * 0.62;
+
+  // Far mountains (lighter)
+  ctx.beginPath();
+  ctx.moveTo(0, H);
+  ctx.lineTo(0, baseY + H*0.05);
+  ctx.lineTo(W*0.08, baseY - H*0.12);
+  ctx.lineTo(W*0.18, baseY + H*0.02);
+  ctx.lineTo(W*0.28, baseY - H*0.18);  // Goizha
+  ctx.lineTo(W*0.38, baseY - H*0.06);
+  ctx.lineTo(W*0.48, baseY - H*0.22);  // Azmar peak
+  ctx.lineTo(W*0.58, baseY - H*0.08);
+  ctx.lineTo(W*0.68, baseY - H*0.15);
+  ctx.lineTo(W*0.78, baseY - H*0.04);
+  ctx.lineTo(W*0.88, baseY - H*0.13);
+  ctx.lineTo(W, baseY - H*0.05);
+  ctx.lineTo(W, H);
+  ctx.closePath();
+  
+  const mGrad = ctx.createLinearGradient(0, baseY - H*0.2, 0, baseY + H*0.05);
+  mGrad.addColorStop(0, '#1a2540');
+  mGrad.addColorStop(0.5, '#131c33');
+  mGrad.addColorStop(1, '#0e1525');
+  ctx.fillStyle = mGrad;
+  ctx.fill();
+
+  // Snow caps on peaks
+  const peaks = [
+    [W*0.28, baseY - H*0.18, W*0.025],
+    [W*0.48, baseY - H*0.22, W*0.03],
+    [W*0.68, baseY - H*0.15, W*0.022],
+  ];
+  peaks.forEach(([px, py, pw]) => {
+    ctx.beginPath();
+    ctx.moveTo(px - pw, py + pw*0.6);
+    ctx.lineTo(px, py);
+    ctx.lineTo(px + pw, py + pw*0.6);
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(200,220,255,0.07)';
+    ctx.fill();
+  });
+}
+
+function drawBuildings(ctx, W, H) {
+  const groundY = H * 0.73;
+  const buildings = generateBuildings(W, groundY);
+
+  buildings.forEach(b => {
+    // Shadow/depth side
+    ctx.fillStyle = b.shadow;
+    ctx.fillRect(b.x + b.w, b.y, b.w * 0.18, b.h);
+
+    // Main face
+    const bGrad = ctx.createLinearGradient(b.x, b.y, b.x, groundY);
+    bGrad.addColorStop(0, b.topColor);
+    bGrad.addColorStop(1, b.botColor);
+    ctx.fillStyle = bGrad;
+    ctx.fillRect(b.x, b.y, b.w, b.h);
+
+    // Windows
+    drawWindows(ctx, b);
+
+    // Rooftop light
+    if (b.h > H * 0.12) {
+      ctx.beginPath();
+      ctx.arc(b.x + b.w/2, b.y, 2, 0, Math.PI*2);
+      ctx.fillStyle = Math.random() > 0.5 ? 'rgba(255,80,80,0.8)' : 'rgba(255,200,80,0.6)';
+      ctx.fill();
+    }
+  });
+}
+
+function generateBuildings(W, groundY) {
+  const buildings = [];
+  let x = 0;
+  while (x < W) {
+    const w = Math.random() * (W*0.055) + W*0.02;
+    const maxH = groundY * 0.55;
+    const minH = groundY * 0.08;
+    const h = Math.random() * (maxH - minH) + minH;
+    const y = groundY - h;
+
+    const isDark = Math.random() > 0.4;
+    buildings.push({
+      x, y, w, h,
+      topColor: isDark ? '#1a2240' : '#243058',
+      botColor: isDark ? '#0d1225' : '#131a30',
+      shadow: isDark ? 'rgba(0,0,5,0.6)' : 'rgba(5,10,25,0.5)',
+      winColor: Math.random() > 0.3 ? 'rgba(255,230,150,0.7)' : 'rgba(180,210,255,0.5)',
+    });
+    x += w + Math.random() * (W*0.005);
+  }
+  return buildings;
+}
+
+function drawWindows(ctx, b) {
+  const ww = Math.max(2, b.w * 0.18);
+  const wh = Math.max(2, b.h * 0.08);
+  const cols = Math.floor(b.w / (ww * 2.2));
+  const rows = Math.floor(b.h / (wh * 2.5));
+  if (cols < 1 || rows < 1) return;
+
+  const padX = (b.w - cols * ww * 2.2 + ww * 1.2) / 2;
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      if (Math.random() > 0.35) {
+        ctx.fillStyle = b.winColor;
+        ctx.fillRect(
+          b.x + padX + c * ww * 2.2,
+          b.y + wh * 1.5 + r * wh * 2.5,
+          ww, wh
+        );
+      }
+    }
+  }
+}
+
+window.addEventListener('resize', resize);
+resize();
+
+// Subtle parallax on mouse move
+document.addEventListener('mousemove', e => {
+  const xPct = (e.clientX / window.innerWidth - 0.5) * 2;
+  const yPct = (e.clientY / window.innerHeight - 0.5) * 2;
+  document.querySelector('.page').style.transform =
+    `translate(${xPct * -6}px, ${yPct * -3}px)`;
+});
+</script>
+</body>
+</html>
